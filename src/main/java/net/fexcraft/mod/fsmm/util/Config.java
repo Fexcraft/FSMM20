@@ -1,5 +1,6 @@
 package net.fexcraft.mod.fsmm.util;
 
+import com.mojang.brigadier.context.CommandContext;
 import net.fexcraft.app.json.JsonArray;
 import net.fexcraft.app.json.JsonHandler;
 import net.fexcraft.app.json.JsonMap;
@@ -8,6 +9,7 @@ import net.fexcraft.mod.fsmm.FSMM;
 import net.fexcraft.mod.fsmm.data.Money;
 import net.fexcraft.mod.fsmm.data.MoneyItem;
 import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -311,6 +313,10 @@ public class Config {
 
 	public static void log(String str){
 		FSMM.LOGGER.info(str);
+	}
+
+	public static void chat(CommandContext<CommandSourceStack> cmd, String str){
+		chat(cmd.getSource().source, str);
 	}
 
 }
