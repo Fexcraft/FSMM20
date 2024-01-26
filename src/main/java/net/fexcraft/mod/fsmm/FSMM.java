@@ -1,10 +1,16 @@
 package net.fexcraft.mod.fsmm;
 
 import com.mojang.logging.LogUtils;
+import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
+import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
+import net.fexcraft.mod.fsmm.data.AccountPermission;
+import net.fexcraft.mod.fsmm.data.Bank;
 import net.fexcraft.mod.fsmm.data.MobileAtm;
 import net.fexcraft.mod.fsmm.data.Money;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
+import net.fexcraft.mod.fsmm.util.ItemManager;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,14 +25,13 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.*;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 
@@ -35,6 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.fexcraft.mod.fsmm.util.Config.chat;
+
 /**
  * @author Ferdinand Calo' (FEX___96)
  */
@@ -42,6 +49,7 @@ import java.util.stream.Collectors;
 public class FSMM {
 
 	public static final String MODID = "fsmm";
+	public static final String PREFIX = "&0[&bFSMM&0]&7 ";
 	public static final Logger LOGGER = LogUtils.getLogger();
 	public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
 	public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
@@ -70,6 +78,7 @@ public class FSMM {
 		BLOCKS.register(modbus);
 		ITEMS.register(modbus);
 		CREATIVE_MODE_TABS.register(modbus);
+		FsmmAttachments.register(modbus);
 		//
 		NeoForge.EVENT_BUS.register(this);
 	}
@@ -92,6 +101,50 @@ public class FSMM {
 	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event){
 		//
+	}
+
+	@SubscribeEvent
+	public void onCmdReg(RegisterCommandsEvent event){
+		event.getDispatcher().register(Commands.literal("fsmm")
+			.then(Commands.literal("balance").executes(cmd -> {
+				if(cmd.getSource().isPlayer()){
+					long value = ItemManager.countInInventory(cmd.getSource().getPlayer());
+					chat(cmd, "&bInventory&0: &a" + Config.getWorthAsString(value));
+					PlayerAttachment attach = cmd.getSource().getPlayer().getData(FsmmAttachments.PLAYER);
+					if(attach.getSelectedAccount() != null && !attach.getSelectedAccount().getTypeAndId().equals(attach.getAccount().getTypeAndId())){
+						AccountPermission perm = attach.getSelectedAccount();
+						chat(cmd, "&bPersonal Balance&0: &a" + Config.getWorthAsString(attach.getAccount().getBalance()));
+						chat(cmd, "&bSelected Account&0: &a" + attach.getSelectedAccount().getTypeAndId());
+						chat(cmd, "&bSelected Balance&0: &a" + Config.getWorthAsString(attach.getSelectedAccount().getAccount().getBalance()));
+					}
+					else{
+						chat(cmd, "&bAccount Balance&0: &a" + Config.getWorthAsString(attach.getAccount().getBalance()));
+					}
+				}
+				else{
+    				Bank bank = DataManager.getDefaultBank();
+					chat(cmd, "&bDefault Bank Balance&0: &a" + Config.getWorthAsString(bank.getBalance()));
+				}
+				return 0;
+			}))
+			.then(Commands.literal("uuid").executes(cmd -> {
+				cmd.getSource().sendSystemMessage(Component.literal(cmd.getSource().getPlayerOrException().getGameProfile().getId().toString()));
+				return 0;
+			}))
+			.executes(cmd -> {
+				chat(cmd, PREFIX + "============");
+				chat(cmd, "&bUser commands:");
+				chat(cmd, "&7/fsmm balance");
+				chat(cmd, "&7/fsmm uuid");
+				chat(cmd, "&dAdmin commands:");
+				chat(cmd, "&7/fsmm set <type:id/name> <amount>");
+				chat(cmd, "&7/fsmm add <type:id/name> <amount>");
+				chat(cmd, "&7/fsmm sub <type:id/name> <amount>");
+				chat(cmd, "&7/fsmm info <type:id/name>");
+				chat(cmd, "&7/fsmm status");
+				return 0;
+			})
+		);
 	}
 
 
