@@ -1,6 +1,7 @@
 package net.fexcraft.mod.fsmm;
 
 import com.mojang.logging.LogUtils;
+import net.fexcraft.mod.fsmm.util.Config;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -26,7 +27,6 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod(FSMM.MODID)
 public class FSMM {
 
@@ -48,6 +48,8 @@ public class FSMM {
 				output.accept(ATM_ITEM.get());
 			}).build());
 
+	//
+
 	public FSMM(IEventBus modbus){
 		modbus.addListener(this::commonSetup);
 		BLOCKS.register(modbus);
@@ -55,7 +57,7 @@ public class FSMM {
 		CREATIVE_MODE_TABS.register(modbus);
 		//
 		NeoForge.EVENT_BUS.register(this);
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+		Config.register();
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
