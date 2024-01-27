@@ -1,5 +1,6 @@
 package net.fexcraft.mod.fsmm.events;
 
+import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
 import net.fexcraft.mod.fsmm.data.Account;
 import net.fexcraft.mod.fsmm.data.AccountPermission;
 import net.fexcraft.mod.fsmm.data.Bank;
@@ -19,7 +20,7 @@ public class ATMEvent extends Event {
 	
 	private ATMEvent(Player player){
 		this.player = player;
-		this.account = null;//TODO player.getCapability(FSMMCapabilities.PLAYER, null).getAccount();
+		this.account = player.getData(FsmmAttachments.PLAYER).getAccount();
 	}
 	
 	public Player getPlayer(){
