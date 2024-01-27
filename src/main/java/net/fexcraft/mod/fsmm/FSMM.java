@@ -1,6 +1,7 @@
 package net.fexcraft.mod.fsmm;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.logging.LogUtils;
 import net.fexcraft.lib.common.math.Time;
@@ -41,6 +42,8 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static net.fexcraft.mod.fsmm.util.Config.chat;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 /**
  * @author Ferdinand Calo' (FEX___96)
@@ -105,8 +108,8 @@ public class FSMM {
 
 	@SubscribeEvent
 	public void onCmdReg(RegisterCommandsEvent event){
-		event.getDispatcher().register(Commands.literal("fsmm")
-			.then(Commands.literal("balance").executes(cmd -> {
+		event.getDispatcher().register(literal("fsmm")
+			.then(literal("balance").executes(cmd -> {
 				if(cmd.getSource().isPlayer()){
 					long value = ItemManager.countInInventory(cmd.getSource().getPlayer());
 					chat(cmd, "&bInventory&0: &a" + Config.getWorthAsString(value));
@@ -127,15 +130,76 @@ public class FSMM {
 				}
 				return 0;
 			}))
-			.then(Commands.literal("uuid").executes(cmd -> {
+			.then(literal("uuid").executes(cmd -> {
 				cmd.getSource().sendSystemMessage(Component.literal(cmd.getSource().getPlayerOrException().getGameProfile().getId().toString()));
 				return 0;
 			}))
-			.then(Commands.literal("info").requires(pre -> isOp(pre))
-				.then(Commands.argument("accid", StringArgumentType.greedyString())
+			.then(literal("set").requires(pre -> isOp(pre))
+				.then(argument("acc-type", StringArgumentType.string())
+				.then(argument("acc-id", StringArgumentType.string())
+				.then(argument("amount", IntegerArgumentType.integer(0, Integer.MAX_VALUE))
 				.executes(cmd -> {
 					try{
-						processInfo(cmd.getSource().getPlayer(), cmd.getArgument("accid", String.class), (account, online) -> {
+						process(cmd.getSource().getPlayer(), cmd.getArgument("acc-type", String.class), cmd.getArgument("acc-id", String.class), (account, online) -> {
+							long am = cmd.getArgument("amount", Integer.class);
+							account.setBalance(am);
+							chat(cmd, "&bNew Balance&0: &7" + Config.getWorthAsString(account.getBalance()));
+							if(!online) chat(cmd, "&7&oYou modified the balance of an Offline Account.");
+						});
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						chat(cmd, "&c&oErrors during command execution.");
+					}
+					return 0;
+				}
+			)))))
+			.then(literal("add").requires(pre -> isOp(pre))
+				.then(argument("acc-type", StringArgumentType.string())
+				.then(argument("acc-id", StringArgumentType.string())
+				.then(argument("amount", IntegerArgumentType.integer(0, Integer.MAX_VALUE))
+				.executes(cmd -> {
+					try{
+						process(cmd.getSource().getPlayer(), cmd.getArgument("acc-type", String.class), cmd.getArgument("acc-id", String.class), (account, online) -> {
+							long am = cmd.getArgument("amount", Integer.class);
+							account.setBalance((am += account.getBalance()) < 0 ? 0 : am);
+							chat(cmd, "&bNew Balance&0: &7" + Config.getWorthAsString(account.getBalance()));
+							if(!online) chat(cmd, "&7&oYou modified the balance of an Offline Account.");
+						});
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						chat(cmd, "&c&oErrors during command execution.");
+					}
+					return 0;
+				}
+			)))))
+			.then(literal("sub").requires(pre -> isOp(pre))
+				.then(argument("acc-type", StringArgumentType.string())
+				.then(argument("acc-id", StringArgumentType.string())
+				.then(argument("amount", IntegerArgumentType.integer(0, Integer.MAX_VALUE))
+				.executes(cmd -> {
+					try{
+						process(cmd.getSource().getPlayer(), cmd.getArgument("acc-type", String.class), cmd.getArgument("acc-id", String.class), (account, online) -> {
+							long am = cmd.getArgument("amount", Integer.class);
+							account.setBalance((am -= account.getBalance()) < 0 ? 0 : am);
+							chat(cmd, "&bNew Balance&0: &7" + Config.getWorthAsString(account.getBalance()));
+							if(!online) chat(cmd, "&7&oYou modified the balance of an Offline Account.");
+						});
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						chat(cmd, "&c&oErrors during command execution.");
+					}
+					return 0;
+				}
+			)))))
+			.then(literal("info").requires(pre -> isOp(pre))
+				.then(argument("acc-type", StringArgumentType.string())
+				.then(argument("acc-id", StringArgumentType.string())
+				.executes(cmd -> {
+					try{
+						process(cmd.getSource().getPlayer(), cmd.getArgument("acc-type", String.class), cmd.getArgument("acc-id", String.class), (account, online) -> {
 							chat(cmd, "&bAccount&0: &7" + account.getTypeAndId());
 							chat(cmd, "&bBalance&0: &7" + Config.getWorthAsString(account.getBalance()));
 							if(!online) chat(cmd, "&o&7Account Holder is currently offline.");
@@ -147,8 +211,8 @@ public class FSMM {
 					}
 					return 0;
 				}
-			)))
-			.then(Commands.literal("status").requires(pre -> isOp(pre)).executes(cmd -> {
+			))))
+			.then(literal("status").requires(pre -> isOp(pre)).executes(cmd -> {
     			chat(cmd, "&bAccounts loaded (by type): &7");
     			long temp = 0;
     			for(String str : DataManager.getAccountTypes(false)){
@@ -182,30 +246,23 @@ public class FSMM {
 		return ServerLifecycleHooks.getCurrentServer().getPlayerList().isOp(css.getPlayer().getGameProfile());
 	}
 
-	private void processInfo(Player sender, String arg, BiConsumer<Account, Boolean> cons){
-		ResourceLocation rs;
-		if(arg.contains(":")){
-			String[] split = arg.split(":");
-			rs = new ResourceLocation(split[0], split[1]);
-			if(rs.getNamespace().equals("player")){
-				try{
-					UUID.fromString(rs.getPath());
-				}
-				catch(Exception e){
-					Optional<GameProfile> gp = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(rs.getPath());
-					rs = new ResourceLocation(rs.getNamespace(), gp.get().getId().toString());
-				}
+	private void process(Player sender, String type, String acc, BiConsumer<Account, Boolean> cons){
+		ResourceLocation rs = new ResourceLocation(type, acc.toLowerCase());
+		if(rs.getNamespace().equals("player")){
+			try{
+				UUID.fromString(rs.getPath());
 			}
-		}
-		else{
-			Optional<GameProfile> gp = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(arg);
-			rs = new ResourceLocation("player", gp.get().getId().toString());
+			catch(Exception e){
+				Optional<GameProfile> gp = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(rs.getPath());
+				rs = new ResourceLocation(type, gp.get().getId().toString());
+			}
 		}
 		Account account = DataManager.getAccount(rs.toString(), false, false);
 		boolean online = account != null;
 		if(!online) account = DataManager.getAccount(rs.toString(), true, false);
 		if(account == null){
 			chat(sender, "Account not found.");
+			chat(sender, "Searched: " + rs.toString());
 			return;
 		}
 		cons.accept(account, online);
