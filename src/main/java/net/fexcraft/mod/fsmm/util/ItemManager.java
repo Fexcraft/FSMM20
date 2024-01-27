@@ -79,7 +79,7 @@ public class ItemManager {
 					player.getInventory().add(stack);
 				}
 				else{
-					//TODO player.level().spawnEntity(new EntityItem(player.getEntityWorld(), player.posX, player.posY, player.posZ, stack));
+					player.drop(stack, true);
 				}
 				amount -= money.getWorth();
 			}
