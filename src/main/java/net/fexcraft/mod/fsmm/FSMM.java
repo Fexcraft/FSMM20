@@ -1,15 +1,14 @@
 package net.fexcraft.mod.fsmm;
 
 import com.mojang.logging.LogUtils;
+import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
 import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
-import net.fexcraft.mod.fsmm.data.AccountPermission;
-import net.fexcraft.mod.fsmm.data.Bank;
-import net.fexcraft.mod.fsmm.data.MobileAtm;
-import net.fexcraft.mod.fsmm.data.Money;
+import net.fexcraft.mod.fsmm.data.*;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.fsmm.util.ItemManager;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -25,7 +24,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -38,6 +36,7 @@ import org.slf4j.Logger;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static net.fexcraft.mod.fsmm.util.Config.chat;
@@ -131,6 +130,18 @@ public class FSMM {
 				cmd.getSource().sendSystemMessage(Component.literal(cmd.getSource().getPlayerOrException().getGameProfile().getId().toString()));
 				return 0;
 			}))
+			.then(Commands.literal("status").requires(pre -> isOp(pre)).executes(cmd -> {
+    			chat(cmd, "&bAccounts loaded (by type): &7");
+    			long temp = 0;
+    			for(String str : DataManager.getAccountTypes(false)){
+    				Map<String, Account> map = DataManager.getAccountsOfType(str);
+    				temp = map.values().stream().filter(pre -> pre.lastAccessed() >= 0).count();
+    				chat(cmd, "&2> &b" + str + ": &7" + map.size() + (temp > 0 ? " &8(&a" + temp + "temp.&8)" : ""));
+    			}
+    			chat(cmd, "&bBanks active: &7" + DataManager.getBanks().size());
+    			chat(cmd, "&aLast scheduled unload: &r&7" + Time.getAsString(DataManager.LAST_TIMERTASK));
+				return 0;
+			}))
 			.executes(cmd -> {
 				chat(cmd, PREFIX + "============");
 				chat(cmd, "&bUser commands:");
@@ -145,6 +156,12 @@ public class FSMM {
 				return 0;
 			})
 		);
+	}
+
+	private static boolean isOp(CommandSourceStack css){
+		if(css == null || !css.isPlayer()) return false;
+		if(ServerLifecycleHooks.getCurrentServer().isSingleplayer()) return true;
+		return ServerLifecycleHooks.getCurrentServer().getPlayerList().isOp(css.getPlayer().getGameProfile());
 	}
 
 
