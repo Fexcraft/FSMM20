@@ -1,5 +1,7 @@
 package net.fexcraft.mod.fsmm;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.logging.LogUtils;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
@@ -13,6 +15,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -33,10 +36,8 @@ import net.neoforged.neoforge.registries.*;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static net.fexcraft.mod.fsmm.util.Config.chat;
@@ -130,6 +131,23 @@ public class FSMM {
 				cmd.getSource().sendSystemMessage(Component.literal(cmd.getSource().getPlayerOrException().getGameProfile().getId().toString()));
 				return 0;
 			}))
+			.then(Commands.literal("info").requires(pre -> isOp(pre))
+				.then(Commands.argument("accid", StringArgumentType.greedyString())
+				.executes(cmd -> {
+					try{
+						processInfo(cmd.getSource().getPlayer(), cmd.getArgument("accid", String.class), (account, online) -> {
+							chat(cmd, "&bAccount&0: &7" + account.getTypeAndId());
+							chat(cmd, "&bBalance&0: &7" + Config.getWorthAsString(account.getBalance()));
+							if(!online) chat(cmd, "&o&7Account Holder is currently offline.");
+						});
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						chat(cmd, "&c&oErrors during command execution.");
+					}
+					return 0;
+				}
+			)))
 			.then(Commands.literal("status").requires(pre -> isOp(pre)).executes(cmd -> {
     			chat(cmd, "&bAccounts loaded (by type): &7");
     			long temp = 0;
@@ -164,6 +182,37 @@ public class FSMM {
 		return ServerLifecycleHooks.getCurrentServer().getPlayerList().isOp(css.getPlayer().getGameProfile());
 	}
 
+	private void processInfo(Player sender, String arg, BiConsumer<Account, Boolean> cons){
+		ResourceLocation rs;
+		if(arg.contains(":")){
+			String[] split = arg.split(":");
+			rs = new ResourceLocation(split[0], split[1]);
+			if(rs.getNamespace().equals("player")){
+				try{
+					UUID.fromString(rs.getPath());
+				}
+				catch(Exception e){
+					Optional<GameProfile> gp = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(rs.getPath());
+					rs = new ResourceLocation(rs.getNamespace(), gp.get().getId().toString());
+				}
+			}
+		}
+		else{
+			Optional<GameProfile> gp = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(arg);
+			rs = new ResourceLocation("player", gp.get().getId().toString());
+		}
+		Account account = DataManager.getAccount(rs.toString(), false, false);
+		boolean online = account != null;
+		if(!online) account = DataManager.getAccount(rs.toString(), true, false);
+		if(account == null){
+			chat(sender, "Account not found.");
+			return;
+		}
+		cons.accept(account, online);
+		if(!online){
+			DataManager.unloadAccount(account);
+		}
+	}
 
 	@Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 	public static class ClientEvents {
