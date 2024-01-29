@@ -16,7 +16,7 @@ public class FsmmAttachments {
 
 	private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, "fsmm");
 	public static final Supplier<AttachmentType<PlayerAttachment>> PLAYER = ATTACHMENT_TYPES
-		.register("handler", () -> AttachmentType.builder(iah -> new PlayerAttachment(iah)).build());
+		.register("player", () -> AttachmentType.builder(iah -> new PlayerAttachment(iah)).build());
 
 	public static void register(IEventBus modbus){
 		ATTACHMENT_TYPES.register(modbus);
