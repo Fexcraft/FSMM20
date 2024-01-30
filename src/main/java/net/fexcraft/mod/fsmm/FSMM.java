@@ -8,13 +8,14 @@ import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
 import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
 import net.fexcraft.mod.fsmm.data.*;
+import net.fexcraft.mod.fsmm.ui.ATMBankInfo;
+import net.fexcraft.mod.fsmm.ui.ATMBankSelect;
 import net.fexcraft.mod.fsmm.ui.ATMContainer;
 import net.fexcraft.mod.fsmm.ui.ATMMain;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.fsmm.util.ItemManager;
 import net.fexcraft.mod.uni.UniReg;
-import net.fexcraft.mod.uni.impl.UIImpl;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -99,8 +100,10 @@ public class FSMM {
 		//
 		UniReg.registerUI(UI_ATM_MAIN, ATMMain.class);
 		UniReg.registerMenu(UI_ATM_MAIN, "assets/fsmm/uis/atm_main", ATMContainer.class);
-		UniReg.registerUI(UI_ATM_BANK_INFO, UIImpl.class);
+		UniReg.registerUI(UI_ATM_BANK_INFO, ATMBankInfo.class);
 		UniReg.registerMenu(UI_ATM_BANK_INFO, "assets/fsmm/uis/atm_bank_info", ATMContainer.class);
+		UniReg.registerUI(UI_ATM_BANK_SELECT, ATMBankSelect.class);
+		UniReg.registerMenu(UI_ATM_BANK_SELECT, "assets/fsmm/uis/atm_bank_select", ATMContainer.class);
 		//
 		NeoForge.EVENT_BUS.register(this);
 	}
