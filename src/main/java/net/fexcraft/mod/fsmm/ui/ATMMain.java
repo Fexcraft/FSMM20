@@ -18,9 +18,7 @@ public class ATMMain extends UserInterface {
 	public ATMMain(JsonMap map, ContainerInterface container) throws Exception {
 		super(map, container);
 		menu = (ATMContainer)container;
-		TagCW com = TagCW.create();
-		com.set("cargo", "sync");
-		container.SEND_TO_SERVER.accept(com);
+		menu.sync("account", "bank");
 	}
 
 	@Override
