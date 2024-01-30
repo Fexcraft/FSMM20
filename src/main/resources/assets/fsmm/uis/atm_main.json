@@ -68,36 +68,42 @@
 			"size": [ 242, 7 ],
 			"pos": [ 7, 7 ],
 			"autoscale": true,
+			"color": "#4d4d4d",
 			"value": "..."
 		},
 		"bank_line_1": {
 			"size": [ 242, 7 ],
 			"pos": [ 7, 19 ],
 			"autoscale": true,
+			"color": "#4d4d4d",
 			"value": "..."
 		},
 		"bank_line_2": {
 			"size": [ 242, 7 ],
 			"pos": [ 7, 31 ],
 			"autoscale": true,
+			"color": "#4d4d4d",
 			"value": "..."
 		},
 		"bank_line_3": {
 			"size": [ 233, 7 ],
 			"pos": [ 7, 43 ],
 			"autoscale": true,
+			"color": "#4d4d4d",
 			"value": "..."
 		},
 		"account_name": {
 			"size": [ 222, 7 ],
 			"pos": [ 7, 59 ],
 			"autoscale": true,
+			"color": "#4d4d4d",
 			"value": "..."
 		},
 		"account_balance": {
-			"size": [ 242, 71 ],
-			"pos": [ 7, 209 ],
+			"size": [ 209, 7 ],
+			"pos": [ 7, 71 ],
 			"autoscale": true,
+			"color": "#4d4d4d",
 			"value": "..."
 		}
 	}
