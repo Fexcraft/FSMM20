@@ -5,14 +5,25 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.logging.LogUtils;
 import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.mod.fcl.FCL;
+import net.fexcraft.mod.fsmm.ui.ATMMain;
+import net.fexcraft.mod.uni.EnvInfo;
+import net.fexcraft.mod.uni.UniReg;
 import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
 import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
 import net.fexcraft.mod.fsmm.data.*;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.fsmm.util.ItemManager;
+import net.fexcraft.mod.uni.impl.CIImpl;
+import net.fexcraft.mod.uni.impl.UIImpl;
+import net.fexcraft.mod.uni.ui.*;
+import net.fexcraft.mod.uni.uimpl.UUIButton;
+import net.fexcraft.mod.uni.uimpl.UUIField;
+import net.fexcraft.mod.uni.uimpl.UUITab;
+import net.fexcraft.mod.uni.uimpl.UUIText;
+import net.fexcraft.mod.uni.world.EntityW;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -28,6 +39,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -58,9 +70,11 @@ public class FSMM {
 	public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
 	public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
-	public static final DeferredBlock<Block> ATM_BLOCK = BLOCKS.registerSimpleBlock("atm", BlockBehaviour.Properties.of().mapColor(MapColor.STONE));
+	public static final DeferredBlock<Block> ATM_BLOCK = BLOCKS.register("atm", () -> new AtmBlock());
 	public static final DeferredItem<BlockItem> ATM_ITEM = ITEMS.registerSimpleBlockItem("atm", ATM_BLOCK);
 	public static final DeferredItem<MobileAtm> MOBILE_ATM = ITEMS.register("mobile", () -> new MobileAtm());
+
+	public static final String UI_ATM_MAIN = "fsmm:atm_main";
 
 	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FSMM_TAB =
 		CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
@@ -82,6 +96,9 @@ public class FSMM {
 		ITEMS.register(modbus);
 		CREATIVE_MODE_TABS.register(modbus);
 		FsmmAttachments.register(modbus);
+		//
+		UniReg.registerUI(UI_ATM_MAIN, ATMMain.class);
+		UniReg.registerMenu(UI_ATM_MAIN, "assets/fsmm/uis/atm_main", CIImpl.class);
 		//
 		NeoForge.EVENT_BUS.register(this);
 	}
