@@ -51,13 +51,13 @@
 			"tooltip": "ui.fsmm.atm_main.withdraw"
 		},
 		"deposit": {
-			"size": [ 8, 8 ],
+			"size": [ 10, 10 ],
 			"pos": [ 230, 69 ],
 			"uv": [ 230, 69 ],
 			"tooltip": "ui.fsmm.atm_main.deposit"
 		},
 		"transfer": {
-			"size": [ 8, 8 ],
+			"size": [ 10, 10 ],
 			"pos": [ 241, 69 ],
 			"uv": [ 241, 69 ],
 			"tooltip": "ui.fsmm.atm_main.transfers"
