@@ -9,6 +9,7 @@ import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
 import net.fexcraft.mod.fsmm.data.Account;
 import net.fexcraft.mod.fsmm.data.AccountPermission;
 import net.fexcraft.mod.fsmm.data.Bank;
+import net.fexcraft.mod.fsmm.data.Manageable;
 import net.fexcraft.mod.fsmm.events.ATMEvent;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.fsmm.util.ItemManager;
@@ -23,6 +24,8 @@ import net.neoforged.neoforge.common.NeoForge;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+
+import static net.fexcraft.mod.fsmm.util.Config.chat;
 
 /**
  * @author Ferdinand Calo' (FEX___96)
@@ -94,7 +97,7 @@ public class ATMContainer extends ContainerInterface {
 		}
 		switch(com.getString("cargo")){
 			case "bank":{
-				player.openUI(FSMM.UI_ATM_BANK_INFO, pos);
+				player.openUI(FSMM.UI_ATM_BANK_SELECT, pos);
 				break;
 			}
 			case "transfers":{
@@ -115,6 +118,31 @@ public class ATMContainer extends ContainerInterface {
 			}
 			case "transfer":{
 				player.openUI(FSMM.UI_ATM_ACC_TRANSFER, pos);
+				break;
+			}
+			case "bank_info":{
+				pass.setSelectedBankInATM(DataManager.getBank(com.getString("bank")));
+				player.openUI(FSMM.UI_ATM_BANK_INFO, pos);
+				break;
+			}
+			case "bank_select":{
+				if(!perm.manage){
+					chat((Player)player.direct(), "&cYou do not have permission to manage this account.");
+					((Player)player.direct()).closeContainer();
+					break;
+				}
+				Bank bank = DataManager.getBank(com.getString("bank"));
+				String feeid = account.getType() + ":setup_account";
+				long fee = bank.hasFee(feeid) ? Long.parseLong(bank.getFees().get(feeid).replace("%", "")) : 0;
+				if(account.getBalance() < fee){
+					chat((Player)player.direct(), "&eNot enough money on account to pay the move/setup fee.");
+					((Player)player.direct()).closeContainer();
+				}
+				else{
+					if(fee > 0) account.modifyBalance(Manageable.Action.SUB, fee, player.local());
+					account.setBank(bank);
+					player.openUI(FSMM.UI_ATM_MAIN, pos);
+				}
 				break;
 			}
 			case "sync":{
