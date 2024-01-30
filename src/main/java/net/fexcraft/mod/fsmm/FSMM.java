@@ -5,24 +5,16 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.logging.LogUtils;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.mod.fcl.FCL;
-import net.fexcraft.mod.fsmm.ui.ATMMain;
-import net.fexcraft.mod.uni.EnvInfo;
-import net.fexcraft.mod.uni.UniReg;
 import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
 import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
 import net.fexcraft.mod.fsmm.data.*;
+import net.fexcraft.mod.fsmm.ui.ATMContainer;
+import net.fexcraft.mod.fsmm.ui.ATMMain;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.fsmm.util.ItemManager;
-import net.fexcraft.mod.uni.impl.CIImpl;
+import net.fexcraft.mod.uni.UniReg;
 import net.fexcraft.mod.uni.impl.UIImpl;
-import net.fexcraft.mod.uni.ui.*;
-import net.fexcraft.mod.uni.uimpl.UUIButton;
-import net.fexcraft.mod.uni.uimpl.UUIField;
-import net.fexcraft.mod.uni.uimpl.UUITab;
-import net.fexcraft.mod.uni.uimpl.UUIText;
-import net.fexcraft.mod.uni.world.EntityW;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -32,20 +24,20 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.registries.*;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 
@@ -75,6 +67,14 @@ public class FSMM {
 	public static final DeferredItem<MobileAtm> MOBILE_ATM = ITEMS.register("mobile", () -> new MobileAtm());
 
 	public static final String UI_ATM_MAIN = "fsmm:atm_main";
+	public static final String UI_ATM_BANK_INFO = "fsmm:atm_bank_info";
+	public static final String UI_ATM_BANK_SELECT = "fsmm:atm_bank_select";
+	public static final String UI_ATM_ACC_SELECT = "fsmm:atm_account_select";
+	public static final String UI_ATM_ACC_RECEIVER = "fsmm:atm_account_receiver";
+	public static final String UI_ATM_ACC_WITHDRAW = "fsmm:atm_account_withdraw";
+	public static final String UI_ATM_ACC_DEPOSIT = "fsmm:atm_account_deposit";
+	public static final String UI_ATM_ACC_TRANSFER = "fsmm:atm_account_transfer";
+	public static final String UI_ATM_TRANSFERS = "fsmm:atm_transfers";
 
 	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FSMM_TAB =
 		CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
@@ -98,7 +98,9 @@ public class FSMM {
 		FsmmAttachments.register(modbus);
 		//
 		UniReg.registerUI(UI_ATM_MAIN, ATMMain.class);
-		UniReg.registerMenu(UI_ATM_MAIN, "assets/fsmm/uis/atm_main", CIImpl.class);
+		UniReg.registerMenu(UI_ATM_MAIN, "assets/fsmm/uis/atm_main", ATMContainer.class);
+		UniReg.registerUI(UI_ATM_BANK_INFO, UIImpl.class);
+		UniReg.registerMenu(UI_ATM_BANK_INFO, "assets/fsmm/uis/atm_bank_info", ATMContainer.class);
 		//
 		NeoForge.EVENT_BUS.register(this);
 	}
