@@ -60,7 +60,7 @@
 			"size": [ 10, 10 ],
 			"pos": [ 241, 69 ],
 			"uv": [ 241, 69 ],
-			"tooltip": "ui.fsmm.atm_main.transfers"
+			"tooltip": "ui.fsmm.atm_main.transfer"
 		}
 	},
 	"texts": {
