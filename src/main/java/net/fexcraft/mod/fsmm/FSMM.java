@@ -107,6 +107,8 @@ public class FSMM {
 		UniReg.registerMenu(UI_ATM_ACC_DEPOSIT, "assets/fsmm/uis/atm_acc_deposit", ATMContainer.class);
 		UniReg.registerUI(UI_ATM_TRANSFERS, ATMViewTransfers.class);
 		UniReg.registerMenu(UI_ATM_TRANSFERS, "assets/fsmm/uis/atm_transfers", ATMContainer.class);
+		UniReg.registerUI(UI_ATM_ACC_TRANSFER, ATMTransfer.class);
+		UniReg.registerMenu(UI_ATM_ACC_TRANSFER, "assets/fsmm/uis/atm_acc_transfer", ATMContainer.class);
 		//
 		NeoForge.EVENT_BUS.register(this);
 	}
