@@ -1,5 +1,6 @@
 {
 	"_info_": "FSMM ATM Bank Info",
+	"return": "fsmm:atm_bank_select",
 	"background": true,
 	"size": [ 256, 162 ],
 	"tabs": {
