@@ -216,6 +216,50 @@ public class ATMContainer extends ContainerInterface {
 				}
 				break;
 			}
+			case "account_search":{
+				String type = com.getString("type").toLowerCase();
+				String id = com.getString("id").toLowerCase();
+				if(type.trim().length() == 0 || id.trim().length() == 0 || id.length() < Config.min_search_chars) break;
+				TagCW compound = TagCW.create();
+				ATMEvent.SearchAccounts event = new ATMEvent.SearchAccounts(player.local(), type, id);
+				NeoForge.EVENT_BUS.post(event);
+				accounts = new ArrayList<>();
+				accounts.addAll(event.getAccountsMap().values());
+				TagLW list = TagLW.create();
+				accounts.forEach(account -> {
+					list.add(TagCW.wrap(account.toNBT()));
+				});
+				compound.set("account_list", list);
+				compound.set("cargo", "sync");
+				SEND_TO_CLIENT.accept(compound);
+				break;
+			}
+			case "account_select":{
+				AccountPermission acc = null;
+				String type = com.getString("type"), id = com.getString("id");
+				boolean mode = com.getBoolean("mode");
+				for(AccountPermission perm : accounts){
+					if(perm.getAccount().getType().equals(type) && perm.getAccount().getId().equals(id)){
+						acc = perm;
+						break;
+					}
+				}
+				if(acc != null){
+					if(mode){
+						pass.setSelectedAccount(acc);
+						player.openUI(FSMM.UI_ATM_MAIN, pos);
+					}
+					else{
+						pass.setSelectedReceiver(acc.getAccount());
+						player.openUI(FSMM.UI_ATM_ACC_TRANSFER, pos);
+					}
+				}
+				else{
+					chat(player, "&cERROR: Account not found server side.");
+					((Player)player.direct()).closeContainer();
+				}
+				break;
+			}
 		}
 	}
 
