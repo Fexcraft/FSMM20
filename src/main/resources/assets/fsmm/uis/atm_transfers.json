@@ -1,5 +1,5 @@
 {
-	"_info_": "FSMM ATM Bank Info",
+	"_info_": "FSMM ATM View Transfers",
 	"return": "fsmm:atm_main",
 	"background": true,
 	"size": [ 256, 198 ],
