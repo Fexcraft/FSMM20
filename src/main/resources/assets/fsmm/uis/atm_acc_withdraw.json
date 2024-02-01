@@ -1,5 +1,6 @@
 {
 	"_info_": "FSMM ATM Bank Withdraw",
+	"return": "fsmm:atm_main",
 	"background": true,
 	"size": [ 256, 86 ],
 	"tabs": {
