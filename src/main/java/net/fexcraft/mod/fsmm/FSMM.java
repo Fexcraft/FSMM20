@@ -8,10 +8,7 @@ import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
 import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
 import net.fexcraft.mod.fsmm.data.*;
-import net.fexcraft.mod.fsmm.ui.ATMBankInfo;
-import net.fexcraft.mod.fsmm.ui.ATMBankSelect;
-import net.fexcraft.mod.fsmm.ui.ATMContainer;
-import net.fexcraft.mod.fsmm.ui.ATMMain;
+import net.fexcraft.mod.fsmm.ui.*;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.fsmm.util.ItemManager;
@@ -104,6 +101,10 @@ public class FSMM {
 		UniReg.registerMenu(UI_ATM_BANK_INFO, "assets/fsmm/uis/atm_bank_info", ATMContainer.class);
 		UniReg.registerUI(UI_ATM_BANK_SELECT, ATMBankSelect.class);
 		UniReg.registerMenu(UI_ATM_BANK_SELECT, "assets/fsmm/uis/atm_bank_select", ATMContainer.class);
+		UniReg.registerUI(UI_ATM_ACC_WITHDRAW, ATMWithdraw.class);
+		UniReg.registerMenu(UI_ATM_ACC_WITHDRAW, "assets/fsmm/uis/atm_acc_withdraw", ATMContainer.class);
+		UniReg.registerUI(UI_ATM_ACC_DEPOSIT, ATMDeposit.class);
+		UniReg.registerMenu(UI_ATM_ACC_DEPOSIT, "assets/fsmm/uis/atm_acc_deposit", ATMContainer.class);
 		//
 		NeoForge.EVENT_BUS.register(this);
 	}
@@ -116,6 +117,7 @@ public class FSMM {
 
 	private void commonSetup(final FMLCommonSetupEvent event){
 		Config.regExternal();
+		CURRENCY.values().forEach(val -> val.stackload());
 	}
 
 	@SubscribeEvent
