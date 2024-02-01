@@ -26,7 +26,8 @@
 		"confirm": {
 			"size": [ 10, 10 ],
 			"pos": [ 241, 67 ],
-			"uv": [ 0, 246 ]
+			"uv": [ 0, 246 ],
+			"tooltip": "ui.fsmm.atm_deposit"
 		}
 	},
 	"texts": {
