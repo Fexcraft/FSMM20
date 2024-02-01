@@ -80,7 +80,7 @@ public class ATMTransfer extends UserInterface {
 			texts.get("receiver_id").value(menu.receiver.getType() + ":" + menu.receiver.getId());
 		}
 		else{
-			texts.get("receiver_name").value(I18n.get("ui.fsmm.atm_select_req_info"));
+			texts.get("receiver_name").value(I18n.get("ui.fsmm.atm_select_rec_info"));
 			texts.get("receiver_id").value("");
 		}
 		texts.get("total").value(Formatter.format(pref + Config.getWorthAsString(am + bf)) + "  (total)");
