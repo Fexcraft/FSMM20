@@ -11,6 +11,7 @@ import net.fexcraft.mod.fsmm.data.AccountPermission;
 import net.fexcraft.mod.fsmm.data.Bank;
 import net.fexcraft.mod.fsmm.data.Manageable;
 import net.fexcraft.mod.fsmm.events.ATMEvent;
+import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.fsmm.util.ItemManager;
 import net.fexcraft.mod.uni.tag.TagCW;
@@ -179,6 +180,51 @@ public class ATMContainer extends ContainerInterface {
 				SEND_TO_CLIENT.accept(compound);
 				break;
 			}
+			case "action_deposit":
+			case "action_withdraw":{
+				boolean deposit = com.getString("cargo").endsWith("deposit");
+				if(!(deposit ? perm.deposit : perm.withdraw)){
+					chat(player, "&cNo permission to " + (deposit ? "deposit to" : "withdraw from") + " this account.");
+					return;
+				}
+				if(processSelfAction(com.getLong("amount"), deposit)){
+					((Player)player.direct()).closeContainer();
+				}
+				break;
+			}
+			case "action_transfer":{
+				if(!perm.transfer){
+					chat(player, "&cNo permission to transfer from this account.");
+					return;
+				}
+				long amount = com.getLong("amount");
+				if(amount <= 0) return;
+				if(receiver == null){
+					chat(player, "&cPlease select a receiver!");
+					return;
+				}
+				if(account.getBank().processAction(Bank.Action.TRANSFER, player.local(), account, amount, receiver, false)){
+					chat(player, "&bTransfer &7of &e" + Config.getWorthAsString(amount, false) + " &7processed.");
+					((Player)player.direct()).closeContainer();
+				}
+				else{
+					chat(player, "&bTransfer &cfailed&7.");
+				}
+				break;
+			}
+		}
+	}
+
+	private boolean processSelfAction(long amount, boolean deposit){
+		if(amount <= 0) return false;
+		String dep = deposit ? "&eDeposit" : "&aWithdraw";
+		if(account.getBank().processAction(deposit ? Bank.Action.DEPOSIT : Bank.Action.WITHDRAW, player.local(), account, amount, account, false)){
+			chat(player, dep + " &7of &e" + Config.getWorthAsString(amount, false) + " &7processed.");
+			return true;
+		}
+		else{
+			chat(player, dep + " &cfailed&7.");
+			return false;
 		}
 	}
 
