@@ -36,5 +36,8 @@
 	"ui.fsmm.atm_main.deposit": "&6Deposit &7to &9Account",
 	"ui.fsmm.atm_main.transfer": "&bTransfer &7to another &9Account",
 	"ui.fsmm.atm_withdraw": "&9Confirm &eWidthdraw",
-	"ui.fsmm.atm_deposit": "&9Confirm &6Deposit"
+	"ui.fsmm.atm_deposit": "&9Confirm &6Deposit",
+	"ui.fsmm.atm_transfer": "&9Confirm &bTransfer",
+	"ui.fsmm.atm_select_receiver": "&7Open Account Selection",
+	"ui.fsmm.atm_select_req_info": "Please select a receiver."
 }
