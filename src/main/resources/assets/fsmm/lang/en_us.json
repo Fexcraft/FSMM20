@@ -39,5 +39,7 @@
 	"ui.fsmm.atm_deposit": "&9Confirm &6Deposit",
 	"ui.fsmm.atm_transfer": "&9Confirm &bTransfer",
 	"ui.fsmm.atm_select_receiver": "&7Open Account Selection",
-	"ui.fsmm.atm_select_req_info": "Please select a receiver."
+	"ui.fsmm.atm_select_rec_info": "Please select a receiver.",
+	"ui.fsmm.atm_select_rec_click": "&7Click to select this account.",
+	"ui.fsmm.atm_search": "&7Search/Filter"
 }
