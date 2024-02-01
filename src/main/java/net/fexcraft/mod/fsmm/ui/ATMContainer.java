@@ -109,6 +109,10 @@ public class ATMContainer extends ContainerInterface {
 				player.openUI(FSMM.UI_ATM_ACC_SELECT, pos);
 				break;
 			}
+			case "receiver":{
+				player.openUI(FSMM.UI_ATM_ACC_RECEIVER, pos);
+				break;
+			}
 			case "withdraw":{
 				player.openUI(FSMM.UI_ATM_ACC_WITHDRAW, pos);
 				break;
