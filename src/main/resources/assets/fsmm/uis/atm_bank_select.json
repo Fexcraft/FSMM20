@@ -30,11 +30,13 @@
 	"buttons": {
 		"up": {
 			"size": [ 7, 7 ],
-			"pos": [ 228, 116 ]
+			"pos": [ 228, 116 ],
+			"tooltip": "ui.fsmm.atm_scroll_up"
 		},
 		"down": {
 			"size": [ 7, 7 ],
-			"pos": [ 237, 116 ]
+			"pos": [ 237, 116 ],
+			"tooltip": "ui.fsmm.atm_scroll_down"
 		},
 		"info": {
 			"size": [ 8, 8 ],
