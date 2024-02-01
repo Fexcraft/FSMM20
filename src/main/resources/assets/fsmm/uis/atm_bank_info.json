@@ -29,11 +29,13 @@
 	"buttons": {
 		"up": {
 			"size": [ 7, 7 ],
-			"pos": [ 228, 156 ]
+			"pos": [ 228, 156 ],
+			"tooltip": "ui.fsmm.atm_scroll_up"
 		},
 		"down": {
 			"size": [ 7, 7 ],
-			"pos": [ 237, 156 ]
+			"pos": [ 237, 156 ],
+			"tooltip": "ui.fsmm.atm_scroll_down"
 		}
 	},
 	"texts": {
