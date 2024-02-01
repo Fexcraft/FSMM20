@@ -8,6 +8,7 @@ import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.mod.fsmm.FSMM;
 import net.fexcraft.mod.fsmm.data.Money;
 import net.fexcraft.mod.fsmm.data.MoneyItem;
+import net.fexcraft.mod.uni.world.EntityW;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,14 +23,10 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * @author Ferdinand Calo' (FEX___96)
@@ -317,6 +314,10 @@ public class Config {
 
 	public static void chat(CommandContext<CommandSourceStack> cmd, String str){
 		chat(cmd.getSource().source, str);
+	}
+
+	public static void chat(EntityW entity, String str){
+		chat((CommandSource)entity.local(), str);
 	}
 
 }
