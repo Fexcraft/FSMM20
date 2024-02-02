@@ -1,6 +1,6 @@
 {
-	"_info_": "FSMM ATM Select Receiver",
-	"return": "fsmm:atm_acc_transfer",
+	"_info_": "FSMM ATM Select Account",
+	"return": "fsmm:atm_main",
 	"background": false,
 	"size": [ 256, 152 ],
 	"tabs": {
