@@ -1,6 +1,7 @@
 {
 	"itemGroup.fsmm": "FSMM - Fex's Small Money Mod",
-	"block.fsmm.atm":"Automated Teller Machine",
+	"block.fsmm.atm": "Automated Teller Machine",
+	"item.fsmm.mobile": "FSMM Mobile Banking",
 
 	"item.fsmm.1cent": "1 Cent",
 	"item.fsmm.2cent": "2 Cent",
@@ -27,6 +28,7 @@
 	"item.fsmm.200kfoney": "200k Foney",
 	"item.fsmm.500kfoney": "500k Foney",
 
+	"ui.fsmm.atm_only": "&eAction only available via Block ATM.",
 	"ui.fsmm.atm_scroll_up": "&7Scroll Up",
 	"ui.fsmm.atm_scroll_down": "&7Scroll Down",
 	"ui.fsmm.atm_main.bank": "&7Bank Info &8/ &9 Change Bank",
