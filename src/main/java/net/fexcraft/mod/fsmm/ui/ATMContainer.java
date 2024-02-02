@@ -3,6 +3,7 @@ package net.fexcraft.mod.fsmm.ui;
 import net.fexcraft.app.json.JsonHandler;
 import net.fexcraft.app.json.JsonMap;
 import net.fexcraft.lib.common.math.V3I;
+import net.fexcraft.mod.fsmm.AtmBlock;
 import net.fexcraft.mod.fsmm.FSMM;
 import net.fexcraft.mod.fsmm.attach.FsmmAttachments;
 import net.fexcraft.mod.fsmm.attach.PlayerAttachment;
@@ -18,8 +19,11 @@ import net.fexcraft.mod.uni.tag.TagCW;
 import net.fexcraft.mod.uni.tag.TagLW;
 import net.fexcraft.mod.uni.ui.ContainerInterface;
 import net.fexcraft.mod.uni.world.EntityW;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.ArrayList;
@@ -49,6 +53,16 @@ public class ATMContainer extends ContainerInterface {
 		receiver = pass.getSelectedReceiver();
 		bank = pass.getSelectedBankInATM() == null ? account.getBank() : pass.getSelectedBankInATM();
 		pass.setSelectedBankInATM(null);
+	}
+
+	public void init(){
+		if(uiid.equals(FSMM.UI_ATM_ACC_DEPOSIT) || uiid.equals(FSMM.UI_ATM_ACC_WITHDRAW)){
+			BlockState state = ((Player)player.direct()).level().getBlockState(new BlockPos(pos.x, pos.y, pos.z));
+			if(state.getBlock() instanceof AtmBlock == false){
+				((Player)player.direct()).closeContainer();
+				if(!player.isOnClient()) chat(player, I18n.get("ui.fsmm.atm_only"));
+			}
+		}
 	}
 
 	@Override
